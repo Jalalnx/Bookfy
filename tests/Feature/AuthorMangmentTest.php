@@ -11,7 +11,7 @@ use Tests\TestCase;
 class AuthorMangmentTest extends TestCase
 {
     use RefreshDatabase;
-
+//>cls && vendor\bin\phpunit --filter a_Author_can_be_created
     /** @test */
     public function a_Author_can_be_created()
     {

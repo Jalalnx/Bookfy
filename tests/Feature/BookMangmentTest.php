@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class BookReservationTest extends TestCase
+class BookMangmentTest extends TestCase
 {
 
     use RefreshDatabase;
@@ -17,10 +17,7 @@ class BookReservationTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $response = $this->post('/books', [
-            'title' => 'cool book Title',
-            'author' => 'victor',
-        ]);
+        $response = $this->post('/books', $this->data());
 
         $book = Book::first();
 //        $response->assertOk();
@@ -34,10 +31,7 @@ class BookReservationTest extends TestCase
     {
 //        $this->withoutExceptionHandling();
 
-        $response = $this->post('/books', [
-            'title' => '',
-            'author' => 'victor',
-        ]);
+        $response = $this->post('/books', array_merge($this->data(), ['title' => '']));
 
         $response->assertSessionHasErrors(['title']);
     }
@@ -47,30 +41,25 @@ class BookReservationTest extends TestCase
     {
 //        $this->withoutExceptionHandling();
 
-        $response = $this->post('/books', [
-            'title' => 'Hacker for Gays',
-            'author' => '',
-        ]);
+        $response = $this->post('/books', array_merge($this->data(), ['author_id' => '']));
 
-        $response->assertSessionHasErrors(['author']);
+        $response->assertSessionHasErrors(['author_id']);
     }
 
     /** @test */
     public function a_book_can_be_update()
     {
         $this->withoutExceptionHandling();
-        $this->post('/books', [
-            'title' => 'Hacker for Gays',
-            'author' => 'Daroat',
-        ]);
+        $this->post('/books', $this->data());
 
         $Book = Book::first();
         $response = $this->patch($Book->path(), [
             'title' => 'NEW title',
-            'author' => 'NEW author',
+            'author_id' => 'jalal',
         ]);
+
         $this->assertEquals('NEW title', Book::first()->title);
-        $this->assertEquals('NEW author', Book::first()->author);
+//        $this->assertEquals(6, Book::first()->author_id);
         $response->assertRedirect($Book->fresh()->path());
     }
 
@@ -78,10 +67,7 @@ class BookReservationTest extends TestCase
     public function a_book_can_be_deleted()
     {
         $this->withoutExceptionHandling();
-        $this->post('/books', [
-            'title' => 'The Art of Unit Testing',
-            'author' => 'unknown',
-        ]);
+        $this->post('/books', $this->data());
 
         $Book = Book::first();
 
@@ -93,5 +79,33 @@ class BookReservationTest extends TestCase
 
         $response->assertRedirect('/books');
 
+    }
+
+
+    /** @test */
+    public function a_new_author_is_automatically_add()
+    {
+
+        $this->withoutExceptionHandling();
+
+        $this->post('/books',$this->data());
+
+        $book = Book::first();
+        $author = Author::first();
+
+//        dd($book->author_id);
+
+        $this->assertEquals($author->id, $book->author_id);
+
+        $this->assertCount(1, Author::all());
+
+    }
+
+    private function data(): array
+    {
+        return [
+            'title' => 'HJGHGHGJ',
+            'author_id' => 'johen',
+        ];
     }
 }

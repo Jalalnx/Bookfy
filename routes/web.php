@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 //Route::get('/', function () {
 //    return view('welcome');
 //});
+Route::get('migrate', function() {
+    \Illuminate\Support\Facades\Artisan::call('migrate:fresh -—seed');
+});
 
 Route::post('/books',[BooksController::class,'store']);
 Route::patch('/books/{book}',[BooksController::class,'update']);
